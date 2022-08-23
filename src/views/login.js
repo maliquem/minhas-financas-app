@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Card from '../components/card';
 import FormGroup from '../components/form-group'
 
@@ -10,8 +11,7 @@ class Login extends React.Component {
     }
 
     entrar = () => {
-        console.log('Email: ', this.state.email)
-        console.log('Senha: ', this.state.senha)
+        console.log(this.state)
     }
 
   render() {
@@ -26,25 +26,27 @@ class Login extends React.Component {
                                     <fieldset>
                                         <FormGroup label="Email: *" htmlFor="exampleInputEmail1">
                                             <input type="email"
-                                                value={this.state.email}
-                                                onChange={e => this.setState({ email: e.target.value })} 
-                                                className="form-control" 
-                                                id="exampleInputEmail1" 
-                                                aria-describedby="emailHelp" 
-                                                placeholder="Digite o Email"/>
+                                                   value={this.state.email}
+                                                   onChange={e => this.setState({ email: e.target.value })} 
+                                                   className="form-control" 
+                                                   id="exampleInputEmail1" 
+                                                   aria-describedby="emailHelp" 
+                                                   placeholder="Digite o Email"/>
                                         </FormGroup>
                                         <p></p>
                                         <FormGroup label="Senha: *" htmlFor="exampleInputPassword1">
                                             <input type="password"
-                                                value={this.state.senha}
-                                                onChange={e => this.setState({ senha: e.target.value })}  
-                                                className="form-control" 
-                                                id="exampleInputPassword1" 
-                                                placeholder="Digite a Senha"/>
+                                                   value={this.state.senha}
+                                                   onChange={e => this.setState({ senha: e.target.value })}  
+                                                   className="form-control" 
+                                                   id="exampleInputPassword1" 
+                                                   placeholder="Digite a Senha"/>
                                         </FormGroup>
                                         <p></p>
                                             <button onClick={this.entrar} className="btn btn-success">Entrar</button>
-                                            <button className="btn btn-danger">Cadastrar</button>
+                                            <Link to="/cadastrar">
+                                                <button className="btn btn-danger">Cadastrar</button>
+                                            </Link>
                                     </fieldset>
                                 </div>
                             </div>
