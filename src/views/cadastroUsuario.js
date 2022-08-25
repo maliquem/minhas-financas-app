@@ -1,5 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { mensagemAlerta, mensagemErro, mensagemSucesso } from 'components/toastr';
+import UsuarioService from 'app/service/usuarioService';
 import Card from '../components/card';
 import FormGroup from '../components/form-group';
 
@@ -12,8 +14,60 @@ class CadastroUsuario extends React.Component {
         senhaRepetida: ''
     }
 
-    salvar = () => {
-        console.log(this.state)
+    constructor() {
+        super();
+        this.service = new UsuarioService();
+    }
+
+    validar(){
+        const msgs = [];
+
+        if ( !this.state.nome ){
+            msgs.push('O campo Nome é obrigatorio.');
+        }
+
+        if ( !this.state.email ){
+            msgs.push('O campo Email é obrigatorio.');
+        } else if ( !this.state.email.match( /[a-z0-9]+@[a-z0-9]+.[a-z0-9]{2,3}.?[a-z0-9]{2,3}/ ) ){
+            msgs.push('Informe um Email válido.');
+        }
+
+        if ( !this.state.senha || !this.state.senhaRepetida ){
+            msgs.push( 'O campo Senha é obrigatorio.' );
+        } else if ( this.state.senha !== this.state.senhaRepetida ){
+            msgs.push( 'As senhas não são iguais.' )
+        }
+
+        return msgs;
+    }
+
+    cadastrar = () => {
+        const msgs = this.validar();
+
+        if ( msgs.length > 0 ) {
+            msgs.forEach ( ( msg ) => {
+                mensagemAlerta( msg );
+            })
+            return false;
+        }
+
+        const usuario = {
+            nome: this.state.nome,
+            email: this.state.email,
+            senha: this.state.senha
+        }
+
+        this.service.salvar(usuario)
+            .then( response => {
+            mensagemSucesso('Usuário cadastrado com sucesso!');
+            this.props.history('/');
+        }).catch( error => {
+            mensagemErro(error.response.data);
+        });
+    }
+
+    cancelar = () => {
+        this.props.history('/');
     }
 
 
@@ -67,10 +121,9 @@ class CadastroUsuario extends React.Component {
                                                    placeholder="Digite a Senha Novamente"/>
                                         </FormGroup>
                                         <p></p>
-                                            <button onClick={this.salvar} className="btn btn-success">Salvar</button>
-                                            <Link to="/">
-                                                <button className="btn btn-danger">Cancelar</button>
-                                            </Link>
+                                            <button onClick={this.cadastrar} className="btn btn-success">Salvar</button>                                            
+                                            <button onClick={this.cancelar} className="btn btn-danger">Cancelar</button>
+                                            
                                 </fieldset>
                             </div>
                         </div>
@@ -81,4 +134,6 @@ class CadastroUsuario extends React.Component {
     }
 }
 
-export default CadastroUsuario;
+export default (props) => (
+  <CadastroUsuario history={useNavigate()} />
+);

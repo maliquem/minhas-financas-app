@@ -1,8 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/card';
 import FormGroup from '../components/form-group'
-
+import UsuarioService from '../app/service/usuarioService'
+import LocalStorageService from '../app/service/localstorageService'
+import { mensagemErro } from 'components/toastr';
 class Login extends React.Component {
 
     state = {
@@ -10,8 +12,25 @@ class Login extends React.Component {
         senha: ''
     }
 
+    constructor() {
+        super();
+        this.service = new UsuarioService();
+    }
+
     entrar = () => {
-        console.log(this.state)
+        this.service.autenticar({
+            email: this.state.email,
+            senha: this.state.senha
+        }).then( response => {
+            LocalStorageService.adicionarItem( '_usuario_logado', response.data );
+            this.props.history('/home')
+        }).catch( erro => {
+            mensagemErro(erro.response.data);
+        })
+    }
+
+    cadastrar = () => {
+        this.props.history('/cadastrar')
     }
 
   render() {
@@ -43,10 +62,9 @@ class Login extends React.Component {
                                                    placeholder="Digite a Senha"/>
                                         </FormGroup>
                                         <p></p>
-                                            <button onClick={this.entrar} className="btn btn-success">Entrar</button>
-                                            <Link to="/cadastrar">
-                                                <button className="btn btn-danger">Cadastrar</button>
-                                            </Link>
+                                            <button onClick={this.entrar} className="btn btn-success">Entrar</button>                                            
+                                            <button onClick={this.cadastrar} className="btn btn-danger">Cadastrar</button>
+                                            
                                     </fieldset>
                                 </div>
                             </div>
@@ -59,4 +77,6 @@ class Login extends React.Component {
   }
 }
 
-export default Login;
+export default (props) => (
+  <Login history={useNavigate()} />
+);
