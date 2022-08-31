@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { mensagemErro } from 'components/toastr';
+import { mensagemErro, mensagemAlerta, mensagemSucesso } from 'components/toastr';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import Card from '../../components/card';
 import FormGroup from '../../components/form-group';
 import SelectMenu from '../../components/selectMenu';
@@ -22,10 +23,42 @@ class ConsultaLancamentos extends React.Component {
         mes: '',
         tipo: '',
         status: '',
+        visible: false,
+        lancamentoDeletar: {},
         lancamentos: []
     }
 
+    editar = (id) => {
+
+    }
+
+    rejeitar = () => {
+        mensagemAlerta('Lançamento não foi deletado.');
+    }
+
+    abrirConfirmacao = (lancamento) => {
+        this.setState({ visible: true, lancamentoDeletar: lancamento });
+    }
+
+    deletar = () => {
+        this.service.deletar(this.state.lancamentoDeletar.id)
+                    .then( response => {
+                        const lancamentos = this.state.lancamentos;
+                        const index = lancamentos.indexOf(this.state.lancamentoDeletar);
+                        lancamentos.splice(index, 1);
+                        this.setState({lancamentos: lancamentos});
+                        mensagemSucesso('Lançamento deletado com sucesso.');
+                    }).catch( error => {
+                        mensagemErro(error.response.data);
+                    })
+    }
+
     buscar = () => {
+        if (!this.state.ano) {
+            mensagemAlerta('Campo Ano é obrigatório.');
+            return false;
+        }
+
         const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
 
         const lancamentoFiltro = {
@@ -39,7 +72,7 @@ class ConsultaLancamentos extends React.Component {
 
         this.service.consultar(lancamentoFiltro)
                     .then( response => {
-                        this.setState({ lancamentos: response.data })
+                        this.setState({ lancamentos: response.data });
                     }).catch( error => {
                         mensagemErro(error.response.data);
                     });
@@ -47,31 +80,11 @@ class ConsultaLancamentos extends React.Component {
 
     render() {
 
-        const meses = [
-            { label: 'JANEIRO', value: 1 },
-            { label: 'FEVEREIRO', value: 2 },
-            { label: 'MARÇO', value: 3 },
-            { label: 'ABRIL', value: 4 },
-            { label: 'MAIO', value: 5 },
-            { label: 'JUNHO', value: 6 },
-            { label: 'JULHO', value: 7 },
-            { label: 'AGOSTO', value: 8 },
-            { label: 'SETEMBRO', value: 9 },
-            { label: 'OUTUBRO', value: 10 },
-            { label: 'NOVEMBRO', value: 11 },
-            { label: 'DEZEMBRO', value: 12 }
-        ]
+        const meses = this.service.obterListaMeses();
 
-        const tipos = [
-            { label: 'DESPESA', value: 'DESPESA' },
-            { label: 'RECEITA', value: 'RECEITA' }
-        ]
+        const tipos = this.service.obterListaTipos();
 
-        const status = [
-            { label: 'PENDENTE', value: 'PENDENTE'},
-            { label: 'CANCELADO', value: 'CANCELADO'},
-            { label: 'EFETIVADO', value: 'EFETIVADO'}
-        ]
+        const status = this.service.obterListaStatus();
 
         return (
             <div className="container">
@@ -102,6 +115,10 @@ class ConsultaLancamentos extends React.Component {
                                                 className="form-control" 
                                                 lista={meses} />
                                 </FormGroup>
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="bs-component">
                                 <FormGroup htmlFor="inputTipo" label="Tipo de Lançamento: ">
                                     <SelectMenu id="inputTipo"
                                                 value={this.state.tipo}
@@ -118,7 +135,7 @@ class ConsultaLancamentos extends React.Component {
                                 </FormGroup>
                                 <button onClick={this.buscar} type="button" className="btn btn-success">Buscar</button>
                                 <button type="button" className="btn btn-danger">Cadastrar</button>
-                            </div>
+                            </div>                                
                         </div>
                     </div>
                     <br/>                    
@@ -129,7 +146,16 @@ class ConsultaLancamentos extends React.Component {
                             <h1 id="tables"></h1>
                         </div>
                         <div className="bs-component">
-                            <LancamentosTable lancamentos={this.state.lancamentos} />
+                            <ConfirmDialog visible={this.state.visible} 
+                                           onHide={() => this.setState({ visible: false })} 
+                                           message="Tem certeza que deseja deletar esse lançamento?"
+                                           header="Confirmation" 
+                                           icon="pi pi-exclamation-triangle" 
+                                           accept={this.deletar} 
+                                           reject={this.rejeitar}/>
+                            <LancamentosTable lancamentos={this.state.lancamentos} 
+                                              deleteAction={this.abrirConfirmacao} 
+                                              editarAction={this.editar} />
                         </div>
                     </div>
                 </div>
