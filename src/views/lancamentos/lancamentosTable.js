@@ -5,12 +5,12 @@ export default props => {
     const rows = props.lancamentos.map ( lancamento => {
         return (
             <tr key={lancamento.id}>
-                <td>{lancamento.descricao}</td>
+                <th scope="row">{lancamento.descricao}</th>
                 <td>{lancamento.valor}</td>
                 <td>{lancamento.tipo}</td>
                 <td>{lancamento.mes}</td>
                 <td>{lancamento.status}</td>
-                <td>{lancamento.descricao}</td>
+                <td>{lancamento.acoes}</td>
             </tr>
         )
     })
@@ -19,7 +19,7 @@ export default props => {
         <table className="table table-hover">
             <thead>
                 <tr>
-                    <th scope="col">Descrição</th>
+                    <th>Descrição</th>
                     <th scope="col">Valor</th>
                     <th scope="col">Tipo</th>
                     <th scope="col">Mês</th>
