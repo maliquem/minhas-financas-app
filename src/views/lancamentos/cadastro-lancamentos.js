@@ -32,7 +32,7 @@ class CadastroLancamentos extends React.Component {
         const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
         this.service.consultarDescricao(usuarioLogado.id)
                     .then(response => {                                               
-                        this.setState({ descricoes: response.data });                        
+                        this.setState( currentState => ({ ...currentState, descricoes: response.data }));                        
                     }).catch(error => {
                         mensagemErro(error.response.data);
                     });
@@ -50,7 +50,7 @@ class CadastroLancamentos extends React.Component {
                 });
             }
 
-            this.setState({ descricoesFiltradas: descricoesFiltradas });
+            this.setState( currentState => ({ ...currentState, descricoesFiltradas: descricoesFiltradas }));
         }, 250);
     }
     
@@ -70,7 +70,7 @@ class CadastroLancamentos extends React.Component {
                                     <h5>Tipo</h5>
                                     <SelectButton value={this.state.tipo} 
                                                   options={tipos} 
-                                                  onChange={(e) => this.setState({ tipo: e.value })} />
+                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, tipo: e.target.value }))} />
                                 </FormGroup>
                             </div>
                         </div>
@@ -85,7 +85,7 @@ class CadastroLancamentos extends React.Component {
                                                   completeMethod={this.pesquisarDescricao}
                                                   onFocus={e => (console.log(this.state.descricoes))}                                                   
                                                   dropdown                                                                                                 
-                                                  onChange={(e) => this.setState({ descricao: e.target.value })} 
+                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, descricao: e.target.value }))} 
                                                   aria-label="Countries" />
                                                             
                                 </div>
@@ -97,7 +97,7 @@ class CadastroLancamentos extends React.Component {
                                     <h5>Valor</h5>            
                                     <InputNumber inputId="currency-br" 
                                                  value={this.state.valor} 
-                                                 onValueChange={(e) => this.setState({valor: e.target.value})} 
+                                                 onValueChange={(e) => this.setState( currentState => ({ ...currentState, valor: e.target.value }))} 
                                                  mode="currency" 
                                                  currency="BRL" 
                                                  locale="pt-BR" />
@@ -114,7 +114,7 @@ class CadastroLancamentos extends React.Component {
                                     <h5>Mês</h5>            
                                     <Dropdown value={this.state.mes} 
                                               options={meses} 
-                                              onChange={(e) => this.setState({ mes: e.target.value })} 
+                                              onChange={(e) => this.setState( currentState => ({ ...currentState, mes: e.target.value }))} 
                                               optionLabel="label" 
                                               placeholder="Selecione o mês..." />                                                            
                                 </div>
@@ -126,7 +126,7 @@ class CadastroLancamentos extends React.Component {
                                     <h5>Ano</h5>            
                                     <Calendar id="yearpicker" 
                                               value={this.state.ano} 
-                                              onChange={(e) => this.setState({ ano: e.target.value })} 
+                                              onChange={(e) => this.setState( currentState => ({ ...currentState, ano: e.target.value }))} 
                                               view="year" 
                                               dateFormat="yy" />                                                          
                                 </div>
