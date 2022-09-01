@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mensagemErro, mensagemAlerta, mensagemSucesso } from 'components/toastr';
 import { ConfirmDialog } from 'primereact/confirmdialog';
+import { Button } from 'primereact/button';
 import Card from '../../components/card';
 import FormGroup from '../../components/form-group';
 import SelectMenu from '../../components/selectMenu';
@@ -33,7 +34,7 @@ class ConsultaLancamentos extends React.Component {
     }
 
     rejeitar = () => {
-        mensagemAlerta('Lançamento não foi deletado.');
+        this.setState({ lancamentoDeletar: {} });
     }
 
     abrirConfirmacao = (lancamento) => {
@@ -52,6 +53,16 @@ class ConsultaLancamentos extends React.Component {
                         mensagemErro(error.response.data);
                     })
     }
+
+    handleNumChange = event => {
+        if (!event.target.value.match(/[0-9]+/)) {
+            this.setState({ano: ''});
+            mensagemAlerta('Apenas números são aceitos nesse campo.');
+            return false;
+        }
+        
+        this.setState({ano: event.target.value.slice(0, 4)});
+    };
 
     buscar = () => {
         if (!this.state.ano) {
@@ -93,11 +104,11 @@ class ConsultaLancamentos extends React.Component {
                         <div className="col-md-6">
                             <div className="bs-component">
                                 <FormGroup htmlFor="inputAno" label="Ano: *">
-                                    <input type="text" 
+                                    <input type="number"                    
                                            className="form-control" 
                                            id="inputAno"
                                            value={this.state.ano}
-                                           onChange={e => this.setState({ ano: e.target.value })}                                         
+                                           onChange={this.handleNumChange}                                         
                                            placeholder="Digite o Ano"/>
                                 </FormGroup>
                                 <FormGroup htmlFor="inputDescricao" label="Descrição: ">
@@ -133,8 +144,8 @@ class ConsultaLancamentos extends React.Component {
                                                 className="form-control" 
                                                 lista={status} />
                                 </FormGroup>
-                                <button onClick={this.buscar} type="button" className="btn btn-success">Buscar</button>
-                                <button type="button" className="btn btn-danger">Cadastrar</button>
+                                <Button onClick={this.buscar} icon="pi pi-search" label="Buscar" className="p-button-raised p-button-success" />
+                                <Button icon="pi pi-plus" label="Cadastrar" className="p-button-raised p-button-danger" />
                             </div>                                
                         </div>
                     </div>
@@ -142,14 +153,12 @@ class ConsultaLancamentos extends React.Component {
                 </Card>
                 <div className="row">
                     <div className="col-md-12">
-                        <div className="page-header">
-                            <h1 id="tables"></h1>
-                        </div>
+                        <br/>
                         <div className="bs-component">
                             <ConfirmDialog visible={this.state.visible} 
                                            onHide={() => this.setState({ visible: false })} 
                                            message="Tem certeza que deseja deletar esse lançamento?"
-                                           header="Confirmation" 
+                                           header="Confirmação" 
                                            icon="pi pi-exclamation-triangle" 
                                            accept={this.deletar} 
                                            reject={this.rejeitar}/>
@@ -164,6 +173,7 @@ class ConsultaLancamentos extends React.Component {
     }
 }
 
-export default (props) => (
+// eslint-disable-next-line import/no-anonymous-default-export
+export default () => (
     <ConsultaLancamentos history={useNavigate()} />
 );

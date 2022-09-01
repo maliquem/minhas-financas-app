@@ -134,6 +134,8 @@ class CadastroUsuario extends React.Component {
     }
 }
 
-export default (props) => (
+
+// eslint-disable-next-line import/no-anonymous-default-export
+export default () => (
   <CadastroUsuario history={useNavigate()} />
 );

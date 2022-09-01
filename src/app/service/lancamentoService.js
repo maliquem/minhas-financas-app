@@ -26,8 +26,8 @@ export default class LancamentoService extends ApiService {
 
     obterListaTipos(){
         return [
-            { label: 'DESPESA', value: 'DESPESA' },
-            { label: 'RECEITA', value: 'RECEITA' }
+            { label: 'RECEITA', value: 'RECEITA' },
+            { label: 'DESPESA', value: 'DESPESA' }
         ]
     }
 
@@ -63,6 +63,10 @@ export default class LancamentoService extends ApiService {
         }
 
         return this.get(params);
+    }
+
+    consultarDescricao(id){
+        return this.get(`/descricao/${id}`);
     }
 
     salvar(lancamento){

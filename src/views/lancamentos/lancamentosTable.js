@@ -2,6 +2,7 @@ import currencyFormatter from 'currency-formatter';
 import React from 'react';
 import { Button } from 'primereact/button';
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default props => {
 
     const converterMes = function (mes) {
@@ -52,11 +53,11 @@ export default props => {
                 <td>{converterMes(lancamento.mes)}</td>
                 <td>{lancamento.status}</td>
                 <td>
-                    <Button onClick={e => props.editarAction(lancamento.id)} 
-                            icon="pi pi-ellipsis-v" 
+                    <Button onClick={() => props.editarAction(lancamento.id)} 
+                            icon="pi pi-pencil" 
                             className="p-button-rounded p-button-text" 
                             aria-label="Editar" />
-                    <Button onClick={e => props.deleteAction(lancamento)} 
+                    <Button onClick={() => props.deleteAction(lancamento)} 
                             icon="pi pi-times" 
                             className="p-button-rounded p-button-danger p-button-text" 
                             aria-label="Deletar" />
@@ -74,7 +75,7 @@ export default props => {
                     <th scope="col">Tipo</th>
                     <th scope="col">Mês</th>
                     <th scope="col">Situação</th>
-                    <th scope="col">Ações</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
