@@ -42,7 +42,7 @@ class CadastroLancamentos extends React.Component {
         setTimeout(() => {
             let descricoesFiltradas = [];
             if (!event.query.trim().length) {
-                descricoesFiltradas = this.state.descricoes;
+                descricoesFiltradas = [...this.state.descricoes];
             }
             else {
                 descricoesFiltradas = this.state.descricoes.filter( des => {
@@ -81,7 +81,7 @@ class CadastroLancamentos extends React.Component {
                                 <div className="grid p-fluid">
                                     <h5>Descrição</h5>            
                                     <AutoComplete value={this.state.descricao} 
-                                                  suggestions={this.state.descricoesFiltradas} 
+                                                  suggestions={this.state.descricoes} 
                                                   completeMethod={this.pesquisarDescricao}
                                                   onFocus={e => (console.log(this.state.descricoes))}                                                   
                                                   dropdown                                                                                                 

@@ -5,6 +5,7 @@ import Consulta from '../views/lancamentos/consulta-lancamentos';
 import CadastroLancamentos from 'views/lancamentos/cadastro-lancamentos';
 import NotFound from '../views/notFound';
 import Navbar from '../components/navBar';
+import PrimeBar from '../components/primeReactMenubar';
 import Home from '../views/home';
 import { Route, Routes } from 'react-router-dom';
 import 'toastr/toastr.js'
@@ -19,7 +20,7 @@ class App extends React.Component {
   render() {
     return (
       <>
-      <Navbar/>
+      <PrimeBar/>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/cadastrar" element={<Cadastro />} />
