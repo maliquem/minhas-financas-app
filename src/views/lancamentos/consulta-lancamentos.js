@@ -9,6 +9,7 @@ import SelectMenu from '../../components/selectMenu';
 import LancamentosTable from './lancamentosTable';
 import LancamentoService from 'app/service/lancamentoService';
 import LocalStorageService from 'app/service/localstorageService';
+import { Calendar } from 'primereact/calendar';
 
 
 class ConsultaLancamentos extends React.Component {
@@ -103,7 +104,16 @@ class ConsultaLancamentos extends React.Component {
                     <div className="row">
                         <div className="col-md-6">
                             <div className="bs-component">
-                                <FormGroup htmlFor="inputAno" label="Ano: *">
+                                <div className="grid p-fluid">
+                                    <h5>Ano</h5>            
+                                    <Calendar id="yearpicker" 
+                                              value={this.state.ano} 
+                                              onChange={(e) => this.setState( currentState => ({ ...currentState, ano: e.target.value }))} 
+                                              view="year" 
+                                              dateFormat="yy"
+                                              placeholder="Selecione o ano..." />                                                          
+                                </div>
+                                {/* <FormGroup htmlFor="inputAno" label="Ano: *">
                                     <input type="number"                    
                                            className="form-control" 
                                            id="inputAno"
@@ -125,12 +135,12 @@ class ConsultaLancamentos extends React.Component {
                                                 onChange={e => this.setState({ mes: e.target.value })} 
                                                 className="form-control" 
                                                 lista={meses} />
-                                </FormGroup>
+                                </FormGroup> */}
                             </div>
                         </div>
                         <div className="col-md-6">
                             <div className="bs-component">
-                                <FormGroup htmlFor="inputTipo" label="Tipo de Lançamento: ">
+                               {/*  <FormGroup htmlFor="inputTipo" label="Tipo de Lançamento: ">
                                     <SelectMenu id="inputTipo"
                                                 value={this.state.tipo}
                                                 onChange={e => this.setState({ tipo: e.target.value })} 
@@ -143,9 +153,8 @@ class ConsultaLancamentos extends React.Component {
                                                 onChange={e => this.setState({ status: e.target.value })} 
                                                 className="form-control" 
                                                 lista={status} />
-                                </FormGroup>
-                                <Button onClick={this.buscar} icon="pi pi-search" label="Buscar" className="p-button-raised p-button-success" />
-                                <Button icon="pi pi-plus" label="Cadastrar" className="p-button-raised p-button-danger" />
+                                </FormGroup> */}
+                                <Button onClick={this.buscar} icon="pi pi-search" label="Buscar" className="p-button-raised p-button-success p-button-text" />                                
                             </div>                                
                         </div>
                     </div>

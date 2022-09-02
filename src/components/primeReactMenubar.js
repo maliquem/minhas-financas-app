@@ -29,7 +29,7 @@ export default class PrimeBar extends Component {
     }
 
     render() {
-        const start = <img alt="logo" src="resources/images/logo.png" height="40" className="mr-2"></img>;
+        const start = <img alt="logo" src="https://raw.githubusercontent.com/maliquem/minhas-financas-app/master/src/resources/images/logo.png" height="60" className="mr-2"></img>;
 
         return (
             <div className="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
