@@ -5,11 +5,12 @@ import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Button } from 'primereact/button';
 import Card from '../../components/card';
 import FormGroup from '../../components/form-group';
-import SelectMenu from '../../components/selectMenu';
 import LancamentosTable from './lancamentosTable';
 import LancamentoService from 'app/service/lancamentoService';
 import LocalStorageService from 'app/service/localstorageService';
 import { Calendar } from 'primereact/calendar';
+import { Dropdown } from 'primereact/dropdown';
+import { InputText } from 'primereact/inputtext';
 
 
 class ConsultaLancamentos extends React.Component {
@@ -104,58 +105,84 @@ class ConsultaLancamentos extends React.Component {
                     <div className="row">
                         <div className="col-md-6">
                             <div className="bs-component">
-                                <div className="grid p-fluid">
-                                    <h5>Ano</h5>            
-                                    <Calendar id="yearpicker" 
-                                              value={this.state.ano} 
-                                              onChange={(e) => this.setState( currentState => ({ ...currentState, ano: e.target.value }))} 
-                                              view="year" 
-                                              dateFormat="yy"
-                                              placeholder="Selecione o ano..." />                                                          
-                                </div>
-                                {/* <FormGroup htmlFor="inputAno" label="Ano: *">
-                                    <input type="number"                    
-                                           className="form-control" 
-                                           id="inputAno"
-                                           value={this.state.ano}
-                                           onChange={this.handleNumChange}                                         
-                                           placeholder="Digite o Ano"/>
-                                </FormGroup>
-                                <FormGroup htmlFor="inputDescricao" label="Descrição: ">
-                                    <input type="text" 
-                                           className="form-control" 
-                                           id="inputDescricao"
-                                           value={this.state.descricao}
-                                           onChange={e => this.setState({ descricao: e.target.value })}                                         
-                                           placeholder="Digite o Descrição"/>
-                                </FormGroup>
-                                <FormGroup htmlFor="inputMes" label="Mês: ">
-                                    <SelectMenu id="inputMes"
-                                                value={this.state.mes}
-                                                onChange={e => this.setState({ mes: e.target.value })} 
-                                                className="form-control" 
-                                                lista={meses} />
-                                </FormGroup> */}
+                                <div className="grid p-fluid">                                    
+                                    <FormGroup htmlFor="inputAno" label="Ano: *">
+                                        <Calendar id="inputAno" 
+                                                  value={this.state.ano} 
+                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, ano: e.target.value }))} 
+                                                  view="year" 
+                                                  dateFormat="yy"
+                                                  placeholder="Selecione o ano..." />                                       
+                                    </FormGroup>            
+                                </div>                                
                             </div>
                         </div>
                         <div className="col-md-6">
                             <div className="bs-component">
-                               {/*  <FormGroup htmlFor="inputTipo" label="Tipo de Lançamento: ">
-                                    <SelectMenu id="inputTipo"
-                                                value={this.state.tipo}
-                                                onChange={e => this.setState({ tipo: e.target.value })} 
-                                                className="form-control" 
-                                                lista={tipos} />
-                                </FormGroup>
-                                <FormGroup htmlFor="inputStatus" label="Status: ">
-                                    <SelectMenu id="inputStatus"
-                                                value={this.state.status}
-                                                onChange={e => this.setState({ status: e.target.value })} 
-                                                className="form-control" 
-                                                lista={status} />
-                                </FormGroup> */}
-                                <Button onClick={this.buscar} icon="pi pi-search" label="Buscar" className="p-button-raised p-button-success p-button-text" />                                
+                                <div className="grid p-fluid">
+                                    <FormGroup htmlFor="inputMes" label="Mes: ">
+                                        <Dropdown id="inputMes"
+                                                  value={this.state.mes} 
+                                                  options={meses} 
+                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, mes: e.target.value }))} 
+                                                  optionLabel="label" 
+                                                  placeholder="Selecione o mês..." />  
+                                    </FormGroup>           
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="bs-component">
+                                <div className="grid p-fluid">
+                                    <FormGroup htmlFor="inputDescricao" label="Descrição: *">
+                                        <InputText id="inputDescricao"
+                                                   value={this.state.descricao}
+                                                   onChange={(e) => this.setState( currentState => ({ ...currentState, descricao: e.target.value }))}                                         
+                                                   placeholder="Digite o Descrição"/>
+                                    </FormGroup>                                                        
+                                </div>
                             </div>                                
+                        </div>
+                        <div className="col-md-6">
+                            <div className="bs-component">
+                                <div className="grid p-fluid">
+                                    <FormGroup htmlFor="inputTipo" label="Tipo: ">
+                                        <Dropdown id="inputTipo"
+                                                  value={this.state.tipo} 
+                                                  options={tipos} 
+                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, tipo: e.target.value }))} 
+                                                  optionLabel="label" 
+                                                  placeholder="Selecione o tipo..." />
+                                    </FormGroup>                                                        
+                                </div>
+                            </div>                                
+                        </div>
+                    </div>                    
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="bs-component">
+                                <div className="grid p-fluid">
+                                    <FormGroup htmlFor="inputStatus" label="Status: ">
+                                        <Dropdown id="inputStatus"
+                                                  value={this.state.status} 
+                                                  options={status} 
+                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, status: e.target.value }))} 
+                                                  optionLabel="label" 
+                                                  placeholder="Selecione o status..." />
+                                    </FormGroup>                                                        
+                                </div>
+                            </div>                                
+                        </div>                                                                                              
+                        <div className="col-md-3">
+                            <div className="bs-component">
+                                <div className="grid p-fluid">
+                                    <FormGroup htmlFor="inputDescricao" label=" *">
+                                        <Button onClick={this.buscar} icon="pi pi-search" label="Buscar" className="p-button-raised p-button-success p-button-text" />
+                                    </FormGroup>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <br/>                    
