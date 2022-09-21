@@ -24,9 +24,10 @@ class CadastroLancamentos extends React.Component {
 
     state = {
         tipo: 'RECEITA',
-        valor: '',
+        status: 'PENDENTE',
+        valor: 0.00,
         mes: '',
-        ano: '',
+        ano: 2022,
         descricao: ''
         //descricoes: [],
         //descricoesFiltradas: []
@@ -37,6 +38,10 @@ class CadastroLancamentos extends React.Component {
 
         if ( !this.state.tipo ){
             msgs.push('O campo Tipo é obrigatorio.');
+        }
+        
+        if ( !this.state.status ){
+            msgs.push('O campo Status é obrigatorio.');
         }
 
         if ( !this.state.valor ){
@@ -75,12 +80,19 @@ class CadastroLancamentos extends React.Component {
             ano: this.state.ano,
             valor: this.state.valor,
             tipo: this.state.tipo,
+            status: this.state.status,
             usuario: usuarioLogado.id
         }
 
         this.service.salvar(lancamento)
             .then( response => {
-            mensagemSucesso('Lançamento cadastrado com sucesso!');            
+            mensagemSucesso('Lançamento cadastrado com sucesso!');
+            this.setState({tipo: 'RECEITA',
+                           status: 'PENDENTE',
+                           valor: 0.00,
+                           mes: '',
+                           ano: 2022,
+                           descricao: ''})            
         }).catch( error => {
             mensagemErro(error.response.data);
         });
@@ -118,11 +130,13 @@ class CadastroLancamentos extends React.Component {
 
         const meses = this.service.obterListaMeses();
 
+        const status = this.service.obterListaStatus();
+
         return(
             <div className="container">
                 <Card title="Cadastro Lançamentos">
                     <div className="row">
-                        <div className="col-md-12">
+                        <div className="col-md-6">
                             <div className="bs-component">
                                 <FormGroup htmlFor="cadastroTipo" label="Tipo: *">                                    
                                     <SelectButton id="cadastroTipo"
@@ -130,6 +144,18 @@ class CadastroLancamentos extends React.Component {
                                                   options={tipos} 
                                                   onChange={(e) => this.setState( currentState => ({ ...currentState, tipo: e.target.value }))} />
                                 </FormGroup>
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="bs-component">
+                                <div className="grid p-fluid">
+                                    <FormGroup htmlFor="cadastroStatus" label="Status: ">                                    
+                                    <SelectButton id="cadastroStatus"
+                                                  value={this.state.status} 
+                                                  options={status} 
+                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, status: e.target.value }))} />
+                                </FormGroup>
+                                </div>
                             </div>
                         </div>
                     </div>              
@@ -183,13 +209,13 @@ class CadastroLancamentos extends React.Component {
                             <div className="bs-component">
                                 <div className="grid p-fluid">
                                     <FormGroup htmlFor="cadastroAno" label="Ano: *">
-                                        <Calendar id="cadastroAno" 
-                                                  value={this.state.ano} 
-                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, ano: e.target.value }))} 
-                                                  view="year" 
-                                                  dateFormat="yy"
-                                                  placeholder="Selecione o ano..."
-                                                  showIcon />                                                          
+                                        <InputNumber id="cadastroAno"
+                                                     inputId="minmax-buttons" 
+                                                     value={this.state.ano} 
+                                                     onValueChange={(e) => this.setState( currentState => ({ ...currentState, ano: e.target.value }))} 
+                                                     mode="decimal"
+                                                     format={false} 
+                                                     showButtons min={2020} max={2030} />                                                          
                                     </FormGroup>            
                                 </div>
                             </div>

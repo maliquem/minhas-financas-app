@@ -8,9 +8,11 @@ import FormGroup from '../../components/form-group';
 import LancamentosTable from './lancamentosTable';
 import LancamentoService from 'app/service/lancamentoService';
 import LocalStorageService from 'app/service/localstorageService';
-import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
+import { InputNumber } from 'primereact/inputnumber';
+import { Dialog } from 'primereact/dialog';
+import { SelectButton } from 'primereact/selectbutton';
 
 
 class ConsultaLancamentos extends React.Component {
@@ -21,50 +23,112 @@ class ConsultaLancamentos extends React.Component {
     }
 
     state = {
-        ano: '',
+        ano: 2022,
         descricao: '',
         mes: '',
         tipo: '',
+        valor: 0.00,
         status: '',
         visible: false,
-        lancamentoDeletar: {},
+        visibleDialog: false,
+        lancamentoTemporario: {},        
         lancamentos: []
+    }    
+
+    validar(){
+        const msgs = [];
+
+        if ( !this.state.lancamentoTemporario.tipo ){
+            msgs.push('O campo Tipo é obrigatorio.');
+        }
+
+        if ( !this.state.lancamentoTemporario.status ){
+            msgs.push('O campo Status é obrigatorio.');
+        }
+
+        if ( !this.state.lancamentoTemporario.valor ){
+            msgs.push('O campo Valor é obrigatorio.');
+        }
+
+        if ( !this.state.lancamentoTemporario.mes ){
+            msgs.push('O campo Mês é obrigatorio.');
+        }
+
+        if ( !this.state.lancamentoTemporario.ano ){
+            msgs.push('O campo Ano é obrigatorio.');
+        }
+
+        if ( !this.state.lancamentoTemporario.descricao ){
+            msgs.push('O campo Descrição é obrigatorio.');
+        }        
+
+        return msgs;
     }
 
-    editar = (id) => {
-
+    abrirDialogoEditar = (id) => {
+        this.service.consultarPorId(id).then( response => {
+            const lancamentoFiltro = response.data;
+            this.setState( currentState => ({ ...currentState,                                            
+                                            lancamentoTemporario: lancamentoFiltro,
+                                            visibleDialog: true }));
+        }).catch( error => {
+            mensagemErro(error.response.data);
+        })
     }
 
     rejeitar = () => {
-        this.setState({ lancamentoDeletar: {} });
+        this.setState( currentState => ({ ...currentState, lancamentoTemporario: {} }));
     }
 
     abrirConfirmacao = (lancamento) => {
-        this.setState({ visible: true, lancamentoDeletar: lancamento });
+        this.setState( currentState => ({ ...currentState, visible: true, lancamentoTemporario: lancamento }));
     }
 
     deletar = () => {
-        this.service.deletar(this.state.lancamentoDeletar.id)
+        this.service.deletar(this.state.lancamentoTemporario.id)
                     .then( response => {
                         const lancamentos = this.state.lancamentos;
-                        const index = lancamentos.indexOf(this.state.lancamentoDeletar);
+                        const index = lancamentos.indexOf(this.state.lancamentoTemporario);
                         lancamentos.splice(index, 1);
-                        this.setState({lancamentos: lancamentos});
+                        this.setState( currentState => ({ ...currentState, lancamentos: lancamentos}));
                         mensagemSucesso('Lançamento deletado com sucesso.');
                     }).catch( error => {
                         mensagemErro(error.response.data);
                     })
     }
 
-    handleNumChange = event => {
-        if (!event.target.value.match(/[0-9]+/)) {
-            this.setState({ano: ''});
-            mensagemAlerta('Apenas números são aceitos nesse campo.');
+    atualizar = () => {
+        const msgs = this.validar();
+        const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
+
+        if ( msgs.length > 0 ) {
+            msgs.forEach ( ( msg ) => {
+                mensagemAlerta( msg );
+            })
             return false;
         }
-        
-        this.setState({ano: event.target.value.slice(0, 4)});
-    };
+
+        const lancamento = {
+            id: this.state.lancamentoTemporario.id,
+            descricao: this.state.lancamentoTemporario.descricao,
+            mes: this.state.lancamentoTemporario.mes,
+            ano: this.state.lancamentoTemporario.ano,
+            valor: this.state.lancamentoTemporario.valor,
+            tipo: this.state.lancamentoTemporario.tipo,
+            status: this.state.lancamentoTemporario.status,
+            usuario: usuarioLogado.id
+        }
+
+        this.service.atualizar(lancamento)
+            .then( response => {
+            this.setState( currentState => ({ ...currentState, visibleDialog: false }));
+            console.log(this.state.lancamentoTemporario)
+            this.buscar();            
+            mensagemSucesso('Lançamento atualizado com sucesso!');            
+        }).catch( error => {
+            mensagemErro(error.response.data);
+        });
+    }   
 
     buscar = () => {
         if (!this.state.ano) {
@@ -85,7 +149,7 @@ class ConsultaLancamentos extends React.Component {
 
         this.service.consultar(lancamentoFiltro)
                     .then( response => {
-                        this.setState({ lancamentos: response.data });
+                        this.setState( currentState => ({ ...currentState, lancamentos: response.data }));
                     }).catch( error => {
                         mensagemErro(error.response.data);
                     });
@@ -97,7 +161,14 @@ class ConsultaLancamentos extends React.Component {
 
         const tipos = this.service.obterListaTipos();
 
-        const status = this.service.obterListaStatus();
+        const status = this.service.obterListaStatus();        
+
+        const footer = (
+            <div>
+                <Button label="Salvar" icon="pi pi-check" onClick={this.atualizar} />
+                <Button label="Cancelar" icon="pi pi-times" onClick={(e) => this.setState( currentState => ({ ...currentState, visibleDialog: false }))} />
+            </div>
+        );        
 
         return (
             <div className="container">
@@ -107,12 +178,13 @@ class ConsultaLancamentos extends React.Component {
                             <div className="bs-component">
                                 <div className="grid p-fluid">                                    
                                     <FormGroup htmlFor="inputAno" label="Ano: *">
-                                        <Calendar id="inputAno" 
-                                                  value={this.state.ano} 
-                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, ano: e.target.value }))} 
-                                                  view="year" 
-                                                  dateFormat="yy"
-                                                  placeholder="Selecione o ano..." />                                       
+                                        <InputNumber id="inputAno"
+                                                     inputId="minmax-buttons" 
+                                                     value={this.state.ano} 
+                                                     onValueChange={(e) => this.setState( currentState => ({ ...currentState, ano: e.target.value }))} 
+                                                     mode="decimal"
+                                                     format={false} 
+                                                     showButtons min={2020} max={2030} />                                       
                                     </FormGroup>            
                                 </div>                                
                             </div>
@@ -136,7 +208,7 @@ class ConsultaLancamentos extends React.Component {
                         <div className="col-md-6">
                             <div className="bs-component">
                                 <div className="grid p-fluid">
-                                    <FormGroup htmlFor="inputDescricao" label="Descrição: *">
+                                    <FormGroup htmlFor="inputDescricao" label="Descrição: ">
                                         <InputText id="inputDescricao"
                                                    value={this.state.descricao}
                                                    onChange={(e) => this.setState( currentState => ({ ...currentState, descricao: e.target.value }))}                                         
@@ -179,7 +251,10 @@ class ConsultaLancamentos extends React.Component {
                             <div className="bs-component">
                                 <div className="grid p-fluid">
                                     <FormGroup htmlFor="inputDescricao" label=" *">
-                                        <Button onClick={this.buscar} icon="pi pi-search" label="Buscar" className="p-button-raised p-button-success p-button-text" />
+                                        <Button onClick={this.buscar} 
+                                                icon="pi pi-search" 
+                                                label="Buscar" 
+                                                className="p-button-raised p-button-success p-button-text" />
                                     </FormGroup>
                                 </div>
                             </div>
@@ -192,15 +267,108 @@ class ConsultaLancamentos extends React.Component {
                         <br/>
                         <div className="bs-component">
                             <ConfirmDialog visible={this.state.visible} 
-                                           onHide={() => this.setState({ visible: false })} 
+                                           onHide={(e) => this.setState( currentState => ({ ...currentState, visible: false }))} 
                                            message="Tem certeza que deseja deletar esse lançamento?"
                                            header="Confirmação" 
                                            icon="pi pi-exclamation-triangle" 
                                            accept={this.deletar} 
                                            reject={this.rejeitar}/>
+                            <Dialog header="Editar Lançamento" 
+                                    footer={footer}                                     
+                                    visible={this.state.visibleDialog}                                    
+                                    breakpoints={{'960px': '75vw', '640px': '100vw'}}
+                                    style={{width: '925px', height: '486px', margin: '0px'}}                                     
+                                    onHide={(e) => this.setState( currentState => ({ ...currentState, visibleDialog: false }))}>
+                                <div className="container">                                    
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="bs-component">
+                                                <FormGroup htmlFor="cadastroTipo" label="Tipo: ">                                    
+                                                    <SelectButton id="cadastroTipo"
+                                                                  value={this.state.lancamentoTemporario.tipo} 
+                                                                  options={tipos} 
+                                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, tipo: e.target.value } }))} />
+                                                </FormGroup>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-6">
+                                            <div className="bs-component">
+                                                <div className="grid p-fluid">
+                                                    <FormGroup htmlFor="cadastroStatus" label="Status: ">                                    
+                                                    <SelectButton id="cadastroStatus"
+                                                                  value={this.state.lancamentoTemporario.status} 
+                                                                  options={status} 
+                                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, status: e.target.value } }))} />
+                                                </FormGroup>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>              
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="bs-component">
+                                                <div className="grid p-fluid">
+                                                   <FormGroup htmlFor="cadastroDescricao" label="Descrição: ">
+                                                        <InputText id="inputDescricao"
+                                                                   value={this.state.lancamentoTemporario.descricao}
+                                                                   onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, descricao: e.target.value } }))}                                         
+                                                                   placeholder="Digite o Descrição"/>
+                                                   </FormGroup>                                                            
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-6">
+                                            <div className="bs-component">
+                                                <div className="grid p-fluid">
+                                                    <FormGroup htmlFor="cadastroValor" label="Valor: ">
+                                                        <InputNumber id="cadastroValor"
+                                                                     inputId="currency-br" 
+                                                                     value={this.state.lancamentoTemporario.valor} 
+                                                                     onValueChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, valor: e.target.value } }))} 
+                                                                     mode="currency" 
+                                                                     currency="BRL" 
+                                                                     locale="pt-BR"/>
+                                                    </FormGroup>           
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>                    
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="bs-component">
+                                                <div className="grid p-fluid">
+                                                    <FormGroup htmlFor="cadastroMes" label="Mês: ">
+                                                        <Dropdown id="cadastroMes"
+                                                                  value={this.state.lancamentoTemporario.mes} 
+                                                                  options={meses} 
+                                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, mes: e.target.value } }))} 
+                                                                  optionLabel="label" 
+                                                                  placeholder="Selecione o mês..." />                                                            
+                                                    </FormGroup>            
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-6">
+                                            <div className="bs-component">
+                                                <div className="grid p-fluid">
+                                                    <FormGroup htmlFor="cadastroAno" label="Ano: ">
+                                                        <InputNumber id="cadastroAno"
+                                                                     inputId="minmax-buttons" 
+                                                                     value={this.state.lancamentoTemporario.ano} 
+                                                                     onValueChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, ano: e.target.value } }))} 
+                                                                     mode="decimal"
+                                                                     format={false} 
+                                                                     showButtons min={2020} max={2030} />                                                          
+                                                    </FormGroup>            
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>   
+                                </div>
+                            </Dialog>
                             <LancamentosTable lancamentos={this.state.lancamentos} 
                                               deleteAction={this.abrirConfirmacao} 
-                                              editarAction={this.editar} />
+                                              editarAction={this.abrirDialogoEditar} />
                         </div>
                     </div>
                 </div>
