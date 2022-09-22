@@ -1,3 +1,4 @@
+import ErroValidacao from 'app/exceptions/ErroValidacao';
 import ApiService from '../apiservice';
 
 
@@ -5,6 +6,38 @@ export default class LancamentoService extends ApiService {
     
     constructor(){
         super('/api/lancamentos');
+    }
+
+    validar(lancamento){
+        const erros = [];
+
+        if ( !lancamento.tipo ){
+            erros.push('O campo Tipo é obrigatorio.');
+        }
+
+        if ( !lancamento.status ){
+            erros.push('O campo Status é obrigatorio.');
+        }
+
+        if ( !lancamento.valor ){
+            erros.push('O campo Valor é obrigatorio.');
+        }
+
+        if ( !lancamento.mes ){
+            erros.push('O campo Mês é obrigatorio.');
+        }
+
+        if ( !lancamento.ano ){
+            erros.push('O campo Ano é obrigatorio.');
+        }
+
+        if ( !lancamento.descricao ){
+            erros.push('O campo Descrição é obrigatorio.');
+        }        
+
+        if (erros.length > 0) {
+            throw new ErroValidacao(erros);
+        }
     }
 
     obterListaMeses(){

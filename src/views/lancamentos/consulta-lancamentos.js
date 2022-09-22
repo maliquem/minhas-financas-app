@@ -14,7 +14,6 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
 import { SelectButton } from 'primereact/selectbutton';
 
-
 class ConsultaLancamentos extends React.Component {
 
     constructor(){
@@ -34,36 +33,6 @@ class ConsultaLancamentos extends React.Component {
         lancamentoTemporario: {},        
         lancamentos: []
     }    
-
-    validar(){
-        const msgs = [];
-
-        if ( !this.state.lancamentoTemporario.tipo ){
-            msgs.push('O campo Tipo é obrigatorio.');
-        }
-
-        if ( !this.state.lancamentoTemporario.status ){
-            msgs.push('O campo Status é obrigatorio.');
-        }
-
-        if ( !this.state.lancamentoTemporario.valor ){
-            msgs.push('O campo Valor é obrigatorio.');
-        }
-
-        if ( !this.state.lancamentoTemporario.mes ){
-            msgs.push('O campo Mês é obrigatorio.');
-        }
-
-        if ( !this.state.lancamentoTemporario.ano ){
-            msgs.push('O campo Ano é obrigatorio.');
-        }
-
-        if ( !this.state.lancamentoTemporario.descricao ){
-            msgs.push('O campo Descrição é obrigatorio.');
-        }        
-
-        return msgs;
-    }
 
     abrirDialogoEditar = (id) => {
         this.service.consultarPorId(id).then( response => {
@@ -97,27 +66,25 @@ class ConsultaLancamentos extends React.Component {
                     })
     }
 
-    atualizar = () => {
-        const msgs = this.validar();
+    atualizar = () => {        
         const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
-        const { id, tipo, status, valor, mes, ano, descricao } = this.state.lancamentoTemporario;
-
-        if ( msgs.length > 0 ) {
-            msgs.forEach ( ( msg ) => {
-                mensagemAlerta( msg );
-            })
-            return false;
-        }
-
+        const { id, tipo, status, valor, mes, ano, descricao } = this.state.lancamentoTemporario;  
         const lancamento = {
             id, tipo, status, valor, mes, ano, descricao,
             usuario: usuarioLogado.id
         }
 
+        try {
+            this.service.validar(lancamento);
+        } catch (erro) {           
+            const mensagens = erro.msg;
+            mensagens.forEach(msg => mensagemAlerta(msg));
+            return false;
+        }
+
         this.service.atualizar(lancamento)
             .then( response => {
-            this.setState( currentState => ({ ...currentState, visibleDialog: false }));
-            console.log(this.state.lancamentoTemporario)
+            this.setState( currentState => ({ ...currentState, visibleDialog: false }));          
             this.buscar();            
             mensagemSucesso('Lançamento atualizado com sucesso!');            
         }).catch( error => {

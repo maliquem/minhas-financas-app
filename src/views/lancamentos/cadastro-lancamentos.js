@@ -29,51 +29,21 @@ class CadastroLancamentos extends React.Component {
         //descricoesFiltradas: []
     }
 
-    validar(){
-        const msgs = [];
-
-        if ( !this.state.tipo ){
-            msgs.push('O campo Tipo é obrigatorio.');
-        }
-        
-        if ( !this.state.status ){
-            msgs.push('O campo Status é obrigatorio.');
-        }
-
-        if ( !this.state.valor ){
-            msgs.push('O campo Valor é obrigatorio.');
-        }
-
-        if ( !this.state.mes ){
-            msgs.push('O campo Mês é obrigatorio.');
-        }
-
-        if ( !this.state.ano ){
-            msgs.push('O campo Ano é obrigatorio.');
-        }
-
-        if ( !this.state.descricao ){
-            msgs.push('O campo Descrição é obrigatorio.');
-        }        
-
-        return msgs;
-    }
-
     cadastrar = () => {
         const msgs = this.validar();
         const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
-        const { tipo, status, valor, mes, ano, descricao } = this.state;
-
-        if ( msgs.length > 0 ) {
-            msgs.forEach ( ( msg ) => {
-                mensagemAlerta( msg );
-            })
-            return false;
-        }
-
+        const { tipo, status, valor, mes, ano, descricao } = this.state; 
         const lancamento = {
             tipo, status, valor, mes, ano, descricao,
             usuario: usuarioLogado.id
+        }
+
+        try {
+            this.service.validar(lancamento);
+        } catch (erro) {           
+            const mensagens = erro.msg;
+            mensagens.forEach(msg => mensagemAlerta(msg));
+            return false;
         }
 
         this.service.salvar(lancamento)
