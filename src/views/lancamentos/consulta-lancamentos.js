@@ -100,7 +100,7 @@ class ConsultaLancamentos extends React.Component {
     atualizar = () => {
         const msgs = this.validar();
         const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
-        const { tipo, status, valor, mes, ano, descricao } = this.state.lancamentoTemporario;
+        const { id, tipo, status, valor, mes, ano, descricao } = this.state.lancamentoTemporario;
 
         if ( msgs.length > 0 ) {
             msgs.forEach ( ( msg ) => {
@@ -110,7 +110,7 @@ class ConsultaLancamentos extends React.Component {
         }
 
         const lancamento = {
-            tipo, status, valor, mes, ano, descricao,
+            id, tipo, status, valor, mes, ano, descricao,
             usuario: usuarioLogado.id
         }
 
@@ -304,7 +304,7 @@ class ConsultaLancamentos extends React.Component {
                                                                   value={this.state.lancamentoTemporario.tipo} 
                                                                   options={tipos}
                                                                   name="tipo" 
-                                                                  onChange={event => this.handleChange(event, this.state.lancamentoTemporario)} />
+                                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, tipo: e.target.value } }))} />
                                                 </FormGroup>
                                             </div>
                                         </div>
