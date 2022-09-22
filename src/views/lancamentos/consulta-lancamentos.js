@@ -29,7 +29,7 @@ class ConsultaLancamentos extends React.Component {
         tipo: '',
         valor: 0.00,
         status: '',
-        visible: false,
+        visibleConfirm: false,
         visibleDialog: false,
         lancamentoTemporario: {},        
         lancamentos: []
@@ -81,7 +81,7 @@ class ConsultaLancamentos extends React.Component {
     }
 
     abrirConfirmacao = (lancamento) => {
-        this.setState( currentState => ({ ...currentState, visible: true, lancamentoTemporario: lancamento }));
+        this.setState( currentState => ({ ...currentState, visibleConfirm: true, lancamentoTemporario: lancamento }));
     }
 
     deletar = () => {
@@ -155,6 +155,18 @@ class ConsultaLancamentos extends React.Component {
                     });
     }
 
+    handleChange = (event, mixa) => {
+        const value = event.target.value;
+        const name = event.target.name;        
+
+        if (mixa) {
+            this.setState( currentState => ({ ...currentState, mixa: { ...currentState.mixa, [name]: value}}));
+            return false;    
+        }
+
+        this.setState( currentState => ({ ...currentState, [name]: value}));
+    }
+
     render() {
 
         const meses = this.service.obterListaMeses();
@@ -165,8 +177,12 @@ class ConsultaLancamentos extends React.Component {
 
         const footer = (
             <div>
-                <Button label="Salvar" icon="pi pi-check" onClick={this.atualizar} />
-                <Button label="Cancelar" icon="pi pi-times" onClick={(e) => this.setState( currentState => ({ ...currentState, visibleDialog: false }))} />
+                <Button label="Salvar" 
+                        icon="pi pi-check" 
+                        onClick={this.atualizar} />
+                <Button label="Cancelar" 
+                        icon="pi pi-times" 
+                        onClick={(e) => this.setState( currentState => ({ ...currentState, visibleDialog: false }))} />
             </div>
         );        
 
@@ -180,8 +196,9 @@ class ConsultaLancamentos extends React.Component {
                                     <FormGroup htmlFor="inputAno" label="Ano: *">
                                         <InputNumber id="inputAno"
                                                      inputId="minmax-buttons" 
-                                                     value={this.state.ano} 
-                                                     onValueChange={(e) => this.setState( currentState => ({ ...currentState, ano: e.target.value }))} 
+                                                     value={this.state.ano}
+                                                     name="ano" 
+                                                     onValueChange={this.handleChange} 
                                                      mode="decimal"
                                                      format={false} 
                                                      showButtons min={2020} max={2030} />                                       
@@ -195,8 +212,9 @@ class ConsultaLancamentos extends React.Component {
                                     <FormGroup htmlFor="inputMes" label="Mes: ">
                                         <Dropdown id="inputMes"
                                                   value={this.state.mes} 
-                                                  options={meses} 
-                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, mes: e.target.value }))} 
+                                                  options={meses}
+                                                  name="mes" 
+                                                  onChange={this.handleChange} 
                                                   optionLabel="label" 
                                                   placeholder="Selecione o mês..." />  
                                     </FormGroup>           
@@ -211,7 +229,8 @@ class ConsultaLancamentos extends React.Component {
                                     <FormGroup htmlFor="inputDescricao" label="Descrição: ">
                                         <InputText id="inputDescricao"
                                                    value={this.state.descricao}
-                                                   onChange={(e) => this.setState( currentState => ({ ...currentState, descricao: e.target.value }))}                                         
+                                                   name="descricao"
+                                                   onChange={this.handleChange}                                         
                                                    placeholder="Digite o Descrição"/>
                                     </FormGroup>                                                        
                                 </div>
@@ -223,8 +242,9 @@ class ConsultaLancamentos extends React.Component {
                                     <FormGroup htmlFor="inputTipo" label="Tipo: ">
                                         <Dropdown id="inputTipo"
                                                   value={this.state.tipo} 
-                                                  options={tipos} 
-                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, tipo: e.target.value }))} 
+                                                  options={tipos}
+                                                  name="tipo" 
+                                                  onChange={this.handleChange} 
                                                   optionLabel="label" 
                                                   placeholder="Selecione o tipo..." />
                                     </FormGroup>                                                        
@@ -239,8 +259,9 @@ class ConsultaLancamentos extends React.Component {
                                     <FormGroup htmlFor="inputStatus" label="Status: ">
                                         <Dropdown id="inputStatus"
                                                   value={this.state.status} 
-                                                  options={status} 
-                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, status: e.target.value }))} 
+                                                  options={status}
+                                                  name="status" 
+                                                  onChange={this.handleChange} 
                                                   optionLabel="label" 
                                                   placeholder="Selecione o status..." />
                                     </FormGroup>                                                        
@@ -266,8 +287,8 @@ class ConsultaLancamentos extends React.Component {
                     <div className="col-md-12">
                         <br/>
                         <div className="bs-component">
-                            <ConfirmDialog visible={this.state.visible} 
-                                           onHide={(e) => this.setState( currentState => ({ ...currentState, visible: false }))} 
+                            <ConfirmDialog visible={this.state.visibleConfirm} 
+                                           onHide={(e) => this.setState( currentState => ({ ...currentState, visibleConfirm: false }))} 
                                            message="Tem certeza que deseja deletar esse lançamento?"
                                            header="Confirmação" 
                                            icon="pi pi-exclamation-triangle" 
@@ -286,8 +307,9 @@ class ConsultaLancamentos extends React.Component {
                                                 <FormGroup htmlFor="cadastroTipo" label="Tipo: ">                                    
                                                     <SelectButton id="cadastroTipo"
                                                                   value={this.state.lancamentoTemporario.tipo} 
-                                                                  options={tipos} 
-                                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, tipo: e.target.value } }))} />
+                                                                  options={tipos}
+                                                                  name="tipo" 
+                                                                  onChange={event => this.handleChange(event, this.state.lancamentoTemporario)} />
                                                 </FormGroup>
                                             </div>
                                         </div>
@@ -297,7 +319,8 @@ class ConsultaLancamentos extends React.Component {
                                                     <FormGroup htmlFor="cadastroStatus" label="Status: ">                                    
                                                     <SelectButton id="cadastroStatus"
                                                                   value={this.state.lancamentoTemporario.status} 
-                                                                  options={status} 
+                                                                  options={status}
+                                                                  name="status" 
                                                                   onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, status: e.target.value } }))} />
                                                 </FormGroup>
                                                 </div>
@@ -311,6 +334,7 @@ class ConsultaLancamentos extends React.Component {
                                                    <FormGroup htmlFor="cadastroDescricao" label="Descrição: ">
                                                         <InputText id="inputDescricao"
                                                                    value={this.state.lancamentoTemporario.descricao}
+                                                                   name="descricao"
                                                                    onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, descricao: e.target.value } }))}                                         
                                                                    placeholder="Digite o Descrição"/>
                                                    </FormGroup>                                                            
@@ -323,7 +347,8 @@ class ConsultaLancamentos extends React.Component {
                                                     <FormGroup htmlFor="cadastroValor" label="Valor: ">
                                                         <InputNumber id="cadastroValor"
                                                                      inputId="currency-br" 
-                                                                     value={this.state.lancamentoTemporario.valor} 
+                                                                     value={this.state.lancamentoTemporario.valor}
+                                                                     name="valor" 
                                                                      onValueChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, valor: e.target.value } }))} 
                                                                      mode="currency" 
                                                                      currency="BRL" 
@@ -340,7 +365,8 @@ class ConsultaLancamentos extends React.Component {
                                                     <FormGroup htmlFor="cadastroMes" label="Mês: ">
                                                         <Dropdown id="cadastroMes"
                                                                   value={this.state.lancamentoTemporario.mes} 
-                                                                  options={meses} 
+                                                                  options={meses}
+                                                                  name="mes" 
                                                                   onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, mes: e.target.value } }))} 
                                                                   optionLabel="label" 
                                                                   placeholder="Selecione o mês..." />                                                            
@@ -354,7 +380,8 @@ class ConsultaLancamentos extends React.Component {
                                                     <FormGroup htmlFor="cadastroAno" label="Ano: ">
                                                         <InputNumber id="cadastroAno"
                                                                      inputId="minmax-buttons" 
-                                                                     value={this.state.lancamentoTemporario.ano} 
+                                                                     value={this.state.lancamentoTemporario.ano}
+                                                                     name="ano" 
                                                                      onValueChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, ano: e.target.value } }))} 
                                                                      mode="decimal"
                                                                      format={false} 

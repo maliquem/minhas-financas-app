@@ -1,15 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SelectButton } from 'primereact/selectbutton';
-//import { AutoComplete } from 'primereact/autocomplete';
 import { InputNumber } from 'primereact/inputnumber';
 import { Dropdown } from 'primereact/dropdown';
-import { Calendar } from 'primereact/calendar';
 import Card from 'components/card';
 import LancamentoService from 'app/service/lancamentoService';
 import FormGroup from 'components/form-group';
-//import LocalStorageService from 'app/service/localstorageService';
-//import { mensagemErro } from 'components/toastr';
 import { InputText } from 'primereact/inputtext';
 import { mensagemAlerta, mensagemErro, mensagemSucesso } from 'components/toastr';
 import LocalStorageService from 'app/service/localstorageService';
@@ -98,6 +94,13 @@ class CadastroLancamentos extends React.Component {
         });
     }
 
+    handleChange = (event) => {
+        const value = event.target.value;
+        const name = event.target.name;
+
+        this.setState( currentState => ({ ...currentState, [name]: value}));
+    }
+
     /* componentDidMount(){
         const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
         this.service.consultarDescricao(usuarioLogado.id)
@@ -141,8 +144,9 @@ class CadastroLancamentos extends React.Component {
                                 <FormGroup htmlFor="cadastroTipo" label="Tipo: *">                                    
                                     <SelectButton id="cadastroTipo"
                                                   value={this.state.tipo} 
-                                                  options={tipos} 
-                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, tipo: e.target.value }))} />
+                                                  options={tipos}
+                                                  name="tipo" 
+                                                  onChange={this.handleChange} />
                                 </FormGroup>
                             </div>
                         </div>
@@ -152,8 +156,9 @@ class CadastroLancamentos extends React.Component {
                                     <FormGroup htmlFor="cadastroStatus" label="Status: ">                                    
                                     <SelectButton id="cadastroStatus"
                                                   value={this.state.status} 
-                                                  options={status} 
-                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, status: e.target.value }))} />
+                                                  options={status}
+                                                  name="status" 
+                                                  onChange={this.handleChange} />
                                 </FormGroup>
                                 </div>
                             </div>
@@ -166,7 +171,8 @@ class CadastroLancamentos extends React.Component {
                                    <FormGroup htmlFor="cadastroDescricao" label="Descrição: *">
                                         <InputText id="inputDescricao"
                                                    value={this.state.descricao}
-                                                   onChange={(e) => this.setState( currentState => ({ ...currentState, descricao: e.target.value }))}                                         
+                                                   name="descricao"
+                                                   onChange={this.handleChange}                                         
                                                    placeholder="Digite o Descrição"/>
                                    </FormGroup>                                                            
                                 </div>
@@ -178,8 +184,9 @@ class CadastroLancamentos extends React.Component {
                                     <FormGroup htmlFor="cadastroValor" label="Valor: *">
                                         <InputNumber id="cadastroValor"
                                                      inputId="currency-br" 
-                                                     value={this.state.valor} 
-                                                     onValueChange={(e) => this.setState( currentState => ({ ...currentState, valor: e.target.value }))} 
+                                                     value={this.state.valor}
+                                                     name="valor" 
+                                                     onValueChange={this.handleChange} 
                                                      mode="currency" 
                                                      currency="BRL" 
                                                      locale="pt-BR"
@@ -197,8 +204,9 @@ class CadastroLancamentos extends React.Component {
                                     <FormGroup htmlFor="cadastroMes" label="Mês: *">
                                         <Dropdown id="cadastroMes"
                                                   value={this.state.mes} 
-                                                  options={meses} 
-                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, mes: e.target.value }))} 
+                                                  options={meses}
+                                                  name="mes" 
+                                                  onChange={this.handleChange} 
                                                   optionLabel="label" 
                                                   placeholder="Selecione o mês..." />                                                            
                                     </FormGroup>            
@@ -211,8 +219,9 @@ class CadastroLancamentos extends React.Component {
                                     <FormGroup htmlFor="cadastroAno" label="Ano: *">
                                         <InputNumber id="cadastroAno"
                                                      inputId="minmax-buttons" 
-                                                     value={this.state.ano} 
-                                                     onValueChange={(e) => this.setState( currentState => ({ ...currentState, ano: e.target.value }))} 
+                                                     value={this.state.ano}
+                                                     name="ano" 
+                                                     onValueChange={this.handleChange} 
                                                      mode="decimal"
                                                      format={false} 
                                                      showButtons min={2020} max={2030} />                                                          
