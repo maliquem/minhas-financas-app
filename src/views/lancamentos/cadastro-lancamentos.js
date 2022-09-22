@@ -62,6 +62,7 @@ class CadastroLancamentos extends React.Component {
     cadastrar = () => {
         const msgs = this.validar();
         const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
+        const { tipo, status, valor, mes, ano, descricao } = this.state;
 
         if ( msgs.length > 0 ) {
             msgs.forEach ( ( msg ) => {
@@ -71,12 +72,7 @@ class CadastroLancamentos extends React.Component {
         }
 
         const lancamento = {
-            descricao: this.state.descricao,
-            mes: this.state.mes,
-            ano: this.state.ano,
-            valor: this.state.valor,
-            tipo: this.state.tipo,
-            status: this.state.status,
+            tipo, status, valor, mes, ano, descricao,
             usuario: usuarioLogado.id
         }
 

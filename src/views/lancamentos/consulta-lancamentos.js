@@ -100,6 +100,7 @@ class ConsultaLancamentos extends React.Component {
     atualizar = () => {
         const msgs = this.validar();
         const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
+        const { tipo, status, valor, mes, ano, descricao } = this.state.lancamentoTemporario;
 
         if ( msgs.length > 0 ) {
             msgs.forEach ( ( msg ) => {
@@ -109,13 +110,7 @@ class ConsultaLancamentos extends React.Component {
         }
 
         const lancamento = {
-            id: this.state.lancamentoTemporario.id,
-            descricao: this.state.lancamentoTemporario.descricao,
-            mes: this.state.lancamentoTemporario.mes,
-            ano: this.state.lancamentoTemporario.ano,
-            valor: this.state.lancamentoTemporario.valor,
-            tipo: this.state.lancamentoTemporario.tipo,
-            status: this.state.lancamentoTemporario.status,
+            tipo, status, valor, mes, ano, descricao,
             usuario: usuarioLogado.id
         }
 
