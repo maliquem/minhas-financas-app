@@ -21,7 +21,7 @@ export default class PrimeBar extends Component {
             {
                 label: 'Lançamentos',
                 icon: 'pi pi-dollar',
-                items: [{label: 'Buscar', icon: 'pi pi-search',command:()=>{ window.location.href="/consulta-lancamento"; }},
+                items: [{label: 'Consultar', icon: 'pi pi-search',command:()=>{ window.location.href="/consulta-lancamento"; }},
                         {label: 'Cadastrar', icon: 'pi pi-plus',command:()=>{ window.location.href="/cadastro-lancamento"; }} ]
             }
             

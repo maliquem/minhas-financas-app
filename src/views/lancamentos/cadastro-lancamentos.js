@@ -207,6 +207,16 @@ class CadastroLancamentos extends React.Component {
                                 </div>
                             </div>
                         </div>
+                        <div className="col-md-3">
+                            <div className="bs-component">
+                                <div className="grid p-fluid">
+                                    <Button onClick={() => { window.location.href="/consulta-lancamento"; }} 
+                                            icon="pi pi-search" 
+                                            label="Consultar" 
+                                            className="p-button-raised" />
+                                </div>
+                            </div>
+                        </div>
                     </div>                                        
                 </Card>
             </div>

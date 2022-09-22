@@ -236,9 +236,19 @@ class ConsultaLancamentos extends React.Component {
                                     <FormGroup htmlFor="inputDescricao" label=" *">
                                         <Button onClick={this.buscar} 
                                                 icon="pi pi-search" 
-                                                label="Buscar" 
-                                                className="p-button-raised p-button-success p-button-text" />
+                                                label="Consultar" 
+                                                className="p-button-raised" />
                                     </FormGroup>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-md-3">
+                            <div className="bs-component">
+                                <div className="grid p-fluid">
+                                    <Button onClick={() => { window.location.href="/cadastro-lancamento"; }} 
+                                            icon="pi pi-dollar" 
+                                            label="Cadastrar" 
+                                            className="p-button-raised p-button-success" />
                                 </div>
                             </div>
                         </div>
