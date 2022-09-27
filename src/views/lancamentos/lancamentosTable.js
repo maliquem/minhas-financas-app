@@ -54,11 +54,13 @@ export default props => {
                 <td>{lancamento.status}</td>
                 <td>
                     <Button onClick={() => props.editarAction(lancamento.id)} 
-                            icon="pi pi-pencil" 
+                            icon="pi pi-pencil"
+                            title="EDITAR" 
                             className="p-button-rounded p-button-text" 
                             aria-label="Editar" />
                     <Button onClick={() => props.deleteAction(lancamento)} 
-                            icon="pi pi-times" 
+                            icon="pi pi-trash"
+                            title="DELETAR" 
                             className="p-button-rounded p-button-danger p-button-text" 
                             aria-label="Deletar" />
                 </td>

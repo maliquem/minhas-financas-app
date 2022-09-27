@@ -201,7 +201,7 @@ class CadastroLancamentos extends React.Component {
                             <div className="bs-component">
                                 <div className="grid p-fluid">
                                     <Button onClick={this.cadastrar} 
-                                            icon="pi pi-dollar" 
+                                            icon="pi pi-plus" 
                                             label="Cadastrar" 
                                             className="p-button-raised p-button-success" />
                                 </div>

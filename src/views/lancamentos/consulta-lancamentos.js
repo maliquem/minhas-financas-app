@@ -99,35 +99,40 @@ class ConsultaLancamentos extends React.Component {
         }
 
         const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
+        const { ano, descricao, mes, tipo, status } = this.state;
 
         const lancamentoFiltro = {
-            ano: this.state.ano,
-            descricao: this.state.descricao,
-            mes: this.state.mes,
-            tipo: this.state.tipo,
-            status: this.state.status,
+            ano, descricao, mes, tipo, status,
             usuario: usuarioLogado.id
         }
 
         this.service.consultar(lancamentoFiltro)
                     .then( response => {
-                        this.setState( currentState => ({ ...currentState, lancamentos: response.data }));
+                        const lista = response.data;
+                        if (lista.length < 1) {
+                            mensagemAlerta('Nenhum Lançamento encontrado.');
+                        }
+                        this.setState( currentState => ({ ...currentState, lancamentos: lista }));
                     }).catch( error => {
                         mensagemErro(error.response.data);
-                    });
+                    });       
+                    
     }
 
-    handleChange = (event, mixa) => {
-        const value = event.target.value;
-        const name = event.target.name;        
-
-        if (mixa) {
-            this.setState( currentState => ({ ...currentState, mixa: { ...currentState.mixa, [name]: value}}));
-            return false;    
-        }
-
-        this.setState( currentState => ({ ...currentState, [name]: value}));
+    handleChange = (event) => {
+         
+        this.setState( currentState => ({ 
+            ...currentState, 
+            [event.target.name]: event.target.value}));
     }
+
+    onLancamentoTemporarioChange = (event) => {
+    this.setState( currentState => ({ 
+       ...currentState,
+       lancamentoTemporario: {
+            ...currentState.lancamentoTemporario,
+            [event.target.name]: event.target.value}}));
+}
 
     render() {
 
@@ -246,7 +251,7 @@ class ConsultaLancamentos extends React.Component {
                             <div className="bs-component">
                                 <div className="grid p-fluid">
                                     <Button onClick={() => { window.location.href="/cadastro-lancamento"; }} 
-                                            icon="pi pi-dollar" 
+                                            icon="pi pi-plus" 
                                             label="Cadastrar" 
                                             className="p-button-raised p-button-success" />
                                 </div>
@@ -281,7 +286,7 @@ class ConsultaLancamentos extends React.Component {
                                                                   value={this.state.lancamentoTemporario.tipo} 
                                                                   options={tipos}
                                                                   name="tipo" 
-                                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, tipo: e.target.value } }))} />
+                                                                  onChange={this.onLancamentoTemporarioChange} />
                                                 </FormGroup>
                                             </div>
                                         </div>
@@ -293,7 +298,7 @@ class ConsultaLancamentos extends React.Component {
                                                                   value={this.state.lancamentoTemporario.status} 
                                                                   options={status}
                                                                   name="status" 
-                                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, status: e.target.value } }))} />
+                                                                  onChange={this.onLancamentoTemporarioChange} />
                                                 </FormGroup>
                                                 </div>
                                             </div>
@@ -307,7 +312,7 @@ class ConsultaLancamentos extends React.Component {
                                                         <InputText id="inputDescricao"
                                                                    value={this.state.lancamentoTemporario.descricao}
                                                                    name="descricao"
-                                                                   onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, descricao: e.target.value } }))}                                         
+                                                                   onChange={this.onLancamentoTemporarioChange}                                         
                                                                    placeholder="Digite o Descrição"/>
                                                    </FormGroup>                                                            
                                                 </div>
@@ -321,7 +326,7 @@ class ConsultaLancamentos extends React.Component {
                                                                      inputId="currency-br" 
                                                                      value={this.state.lancamentoTemporario.valor}
                                                                      name="valor" 
-                                                                     onValueChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, valor: e.target.value } }))} 
+                                                                     onValueChange={this.onLancamentoTemporarioChange} 
                                                                      mode="currency" 
                                                                      currency="BRL" 
                                                                      locale="pt-BR"/>
@@ -339,7 +344,7 @@ class ConsultaLancamentos extends React.Component {
                                                                   value={this.state.lancamentoTemporario.mes} 
                                                                   options={meses}
                                                                   name="mes" 
-                                                                  onChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, mes: e.target.value } }))} 
+                                                                  onChange={this.onLancamentoTemporarioChange} 
                                                                   optionLabel="label" 
                                                                   placeholder="Selecione o mês..." />                                                            
                                                     </FormGroup>            
@@ -354,7 +359,7 @@ class ConsultaLancamentos extends React.Component {
                                                                      inputId="minmax-buttons" 
                                                                      value={this.state.lancamentoTemporario.ano}
                                                                      name="ano" 
-                                                                     onValueChange={(e) => this.setState( currentState => ({ ...currentState, lancamentoTemporario: { ...currentState.lancamentoTemporario, ano: e.target.value } }))} 
+                                                                     onValueChange={this.onLancamentoTemporarioChange} 
                                                                      mode="decimal"
                                                                      format={false} 
                                                                      showButtons min={2020} max={2030} />                                                          
