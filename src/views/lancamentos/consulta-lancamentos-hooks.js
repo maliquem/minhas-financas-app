@@ -145,105 +145,6 @@ export default function ConsultaLancamentos() {
             </div>
     );
 
-    const EditarModal = () => {
-        return(
-
-        <div className="container">                                    
-            <div className="row">
-                <div className="col-md-6">
-                    <div className="bs-component">
-                        <FormGroup htmlFor="cadastroTipo" label="Tipo: ">                                    
-                            <SelectButton id="cadastroTipo"
-                                          value={lancamentoTemporario.tipo} 
-                                          options={listaTipos}
-                                          name="tipo" 
-                                          onChange={onLancamentoTemporarioChange} />
-                        </FormGroup>
-                    </div>
-                </div>
-                <div className="col-md-6">
-                    <div className="bs-component">
-                        <div className="grid p-fluid">
-                            <FormGroup htmlFor="cadastroStatus" label="Status: ">                                    
-                            <SelectButton id="cadastroStatus"
-                                          value={lancamentoTemporario.status} 
-                                          options={listaStatus}
-                                          name="status" 
-                                          onChange={onLancamentoTemporarioChange} />
-                        </FormGroup>
-                        </div>
-                    </div>
-                </div>
-            </div>              
-            <div className="row">
-                <div className="col-md-6">
-                    <div className="bs-component">
-                        <div className="grid p-fluid">
-                           <FormGroup htmlFor="cadastroDescricao" label="Descrição: ">
-                                <InputText id="inputDescricao"
-                                           value={lancamentoTemporario.descricao}
-                                           name="descricao"
-                                           onChange={onLancamentoTemporarioChange}                                         
-                                           placeholder="Digite o Descrição"/>
-                           </FormGroup>                                                            
-                        </div>
-                    </div>
-                </div>
-                <div className="col-md-6">
-                    <div className="bs-component">
-                        <div className="grid p-fluid">
-                            <FormGroup htmlFor="cadastroValor" label="Valor: ">
-                                <InputNumber id="cadastroValor"
-                                             inputId="currency-br" 
-                                             value={lancamentoTemporario.valor}
-                                             name="valor" 
-                                             onValueChange={onLancamentoTemporarioChange} 
-                                             mode="currency" 
-                                             currency="BRL" 
-                                             locale="pt-BR"/>
-                            </FormGroup>           
-                        </div>
-                    </div>
-                </div>
-            </div>                    
-            <div className="row">
-                <div className="col-md-6">
-                    <div className="bs-component">
-                        <div className="grid p-fluid">
-                            <FormGroup htmlFor="cadastroMes" label="Mês: ">
-                                <Dropdown id="cadastroMes"
-                                          value={lancamentoTemporario.mes} 
-                                          options={listaMeses}
-                                          name="mes" 
-                                          onChange={onLancamentoTemporarioChange} 
-                                          optionLabel="label" 
-                                          placeholder="Selecione o mês..." />                                                            
-                            </FormGroup>            
-                        </div>
-                    </div>
-                </div>
-                <div className="col-md-6">
-                    <div className="bs-component">
-                        <div className="grid p-fluid">
-                            <FormGroup htmlFor="cadastroAno" label="Ano: ">
-                                <InputNumber id="cadastroAno"
-                                             inputId="minmax-buttons" 
-                                             value={lancamentoTemporario.ano}
-                                             name="ano" 
-                                             onValueChange={onLancamentoTemporarioChange} 
-                                             mode="decimal"
-                                             format={false} 
-                                             showButtons min={2020} max={2030} />                                                          
-                            </FormGroup>            
-                        </div>
-                    </div>
-                </div>
-            </div>   
-        </div>           
-        )        
-    }
-
-
     return (
          <div className="container">
                 <Card title="Consulta Lançamentos">
@@ -368,7 +269,11 @@ export default function ConsultaLancamentos() {
                                     onHide={(e) => setVisibleDialog(false)} 
                                     breakpoints={{'960px': '75vw', '640px': '100vw'}}
                                     style={{width: '925px', height: '486px', margin: '0px'}}>
-                                <EditarModal></EditarModal>
+                                <EditarModal onLancamentoTemporarioChange={onLancamentoTemporarioChange} 
+                                             lancamentoTemporario={lancamentoTemporario} 
+                                             listaMeses={listaMeses} 
+                                             listaStatus={listaStatus} 
+                                             listaTipos={listaTipos}></EditarModal>
                             </Dialog>
                             <LancamentosTable lancamentos={lancamentos} 
                                               deleteAction={abrirConfirmacao} 
@@ -379,6 +284,103 @@ export default function ConsultaLancamentos() {
             </div>    
     )
 
+}
+
+function EditarModal(props) {
+    return (
+        <div className="container">                                    
+            <div className="row">
+                <div className="col-md-6">
+                    <div className="bs-component">
+                        <FormGroup htmlFor="cadastroTipo" label="Tipo: ">                                    
+                            <SelectButton id="cadastroTipo"
+                                          value={props.lancamentoTemporario.tipo} 
+                                          options={props.listaTipos}
+                                          name="tipo" 
+                                          onChange={props.onLancamentoTemporarioChange} />
+                        </FormGroup>
+                    </div>
+                </div>
+                <div className="col-md-6">
+                    <div className="bs-component">
+                        <div className="grid p-fluid">
+                            <FormGroup htmlFor="cadastroStatus" label="Status: ">                                    
+                            <SelectButton id="cadastroStatus"
+                                          value={props.lancamentoTemporario.status} 
+                                          options={props.listaStatus}
+                                          name="status" 
+                                          onChange={props.onLancamentoTemporarioChange} />
+                        </FormGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>              
+            <div className="row">
+                <div className="col-md-6">
+                    <div className="bs-component">
+                        <div className="grid p-fluid">
+                           <FormGroup htmlFor="cadastroDescricao" label="Descrição: ">
+                                <InputText id="inputDescricao"
+                                           value={props.lancamentoTemporario.descricao}
+                                           name="descricao"
+                                           onChange={props.onLancamentoTemporarioChange}                                         
+                                           placeholder="Digite o Descrição"/>
+                           </FormGroup>                                                            
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-6">
+                    <div className="bs-component">
+                        <div className="grid p-fluid">
+                            <FormGroup htmlFor="cadastroValor" label="Valor: ">
+                                <InputNumber id="cadastroValor"
+                                             inputId="currency-br" 
+                                             value={props.lancamentoTemporario.valor}
+                                             name="valor" 
+                                             onValueChange={props.onLancamentoTemporarioChange} 
+                                             mode="currency" 
+                                             currency="BRL" 
+                                             locale="pt-BR"/>
+                            </FormGroup>           
+                        </div>
+                    </div>
+                </div>
+            </div>                    
+            <div className="row">
+                <div className="col-md-6">
+                    <div className="bs-component">
+                        <div className="grid p-fluid">
+                            <FormGroup htmlFor="cadastroMes" label="Mês: ">
+                                <Dropdown id="cadastroMes"
+                                          value={props.lancamentoTemporario.mes} 
+                                          options={props.listaMeses}
+                                          name="mes" 
+                                          onChange={props.onLancamentoTemporarioChange} 
+                                          optionLabel="label" 
+                                          placeholder="Selecione o mês..." />                                                            
+                            </FormGroup>            
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-6">
+                    <div className="bs-component">
+                        <div className="grid p-fluid">
+                            <FormGroup htmlFor="cadastroAno" label="Ano: ">
+                                <InputNumber id="cadastroAno"
+                                             inputId="minmax-buttons" 
+                                             value={props.lancamentoTemporario.ano}
+                                             name="ano" 
+                                             onValueChange={props.onLancamentoTemporarioChange} 
+                                             mode="decimal"
+                                             format={false} 
+                                             showButtons min={2020} max={2030} />                                                          
+                            </FormGroup>            
+                        </div>
+                    </div>
+                </div>
+            </div>   
+        </div>
+    )
 }
 
 
