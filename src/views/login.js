@@ -1,39 +1,40 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
 import Card from '../components/card';
 import FormGroup from '../components/form-group'
 import UsuarioService from '../app/service/usuarioService'
 import LocalStorageService from '../app/service/localstorageService'
 import { mensagemErro } from 'components/toastr';
-class Login extends React.Component {
+import { USUARIO_LOGADO } from 'app/service/authService';
 
-    state = {
+export default function Login() {
+
+    const [usuario, setUsuario] = useState({
         email: '',
         senha: ''
-    }
+    });  
+    const service = useMemo(() => UserService(), []);    
 
-    constructor() {
-        super();
-        this.service = new UsuarioService();
-    }
-
-    entrar = () => {
-        this.service.autenticar({
-            email: this.state.email,
-            senha: this.state.senha
+    const entrar = () => {
+        service.autenticar({
+            email: usuario.email,
+            senha: usuario.senha
         }).then( response => {
-            LocalStorageService.adicionarItem( '_usuario_logado', response.data );
-            this.props.history('/home')
+            LocalStorageService.adicionarItem( USUARIO_LOGADO, response.data );
+            window.location.href="/home";
         }).catch( erro => {
             mensagemErro(erro.response.data);
         })
     }
 
-    cadastrar = () => {
-        this.props.history('/cadastrar')
+    const cadastrar = () => {
+        window.location.href="/cadastrar";
     }
 
-  render() {
+    const handleUsuarioChange = (event) => {
+         
+        setUsuario(currentState => ({ ...currentState, [event.target.name]: event.target.value }));
+    }
+  
     return(
        <div className="container">
             <div className="row">
@@ -45,8 +46,9 @@ class Login extends React.Component {
                                     <fieldset>
                                         <FormGroup label="Email: *" htmlFor="exampleInputEmail1">
                                             <input type="email"
-                                                   value={this.state.email}
-                                                   onChange={e => this.setState({ email: e.target.value })} 
+                                                   name="email"
+                                                   value={usuario.email}
+                                                   onChange={handleUsuarioChange} 
                                                    className="form-control" 
                                                    id="exampleInputEmail1" 
                                                    aria-describedby="emailHelp" 
@@ -55,15 +57,16 @@ class Login extends React.Component {
                                         <p></p>
                                         <FormGroup label="Senha: *" htmlFor="exampleInputPassword1">
                                             <input type="password"
-                                                   value={this.state.senha}
-                                                   onChange={e => this.setState({ senha: e.target.value })}  
+                                                   name="senha"
+                                                   value={usuario.senha}
+                                                   onChange={handleUsuarioChange}  
                                                    className="form-control" 
                                                    id="exampleInputPassword1" 
                                                    placeholder="Digite a Senha"/>
                                         </FormGroup>
                                         <p></p>
-                                            <button onClick={this.entrar} className="btn btn-success">Entrar</button>                                            
-                                            <button onClick={this.cadastrar} className="btn btn-danger">Cadastrar</button>
+                                            <button onClick={entrar} className="btn btn-success">Entrar</button>                                            
+                                            <button onClick={cadastrar} className="btn btn-danger">Cadastrar</button>
                                             
                                     </fieldset>
                                 </div>
@@ -75,8 +78,8 @@ class Login extends React.Component {
        </div>
     )
   }
-}
 
-export default (props) => (
-  <Login history={useNavigate()} />
-);
+
+function UserService() {
+    return new UsuarioService();
+}

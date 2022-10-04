@@ -1,5 +1,4 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
 import { SelectButton } from 'primereact/selectbutton';
 import { InputNumber } from 'primereact/inputnumber';
 import { Dropdown } from 'primereact/dropdown';
@@ -10,45 +9,43 @@ import { InputText } from 'primereact/inputtext';
 import { mensagemAlerta, mensagemErro, mensagemSucesso } from 'components/toastr';
 import LocalStorageService from 'app/service/localstorageService';
 import { Button } from 'primereact/button';
+import { USUARIO_LOGADO } from 'app/service/authService';
 
-class CadastroLancamentos extends React.Component {
+export default function CadastroLancamentos() {
 
-    constructor(){
-        super();
-        this.service = new LancamentoService();        
-    }
-
-    state = {
+    const [cadastroLancamento, setCadastroLancamento] = useState({
         tipo: 'RECEITA',
         status: 'PENDENTE',
         valor: 0.00,
         mes: '',
         ano: 2022,
         descricao: ''
-        //descricoes: [],
-        //descricoesFiltradas: []
-    }
+    })
+    const service = useMemo(() => UserService(), []);
+    const [listaMeses] = useState(service.obterListaMeses);
+    const [listaTipos] = useState(service.obterListaTipos);
+    const [listaStatus] = useState(service.obterListaStatus);
+    const [usuarioLogado] = useState(LocalStorageService.obterItem( USUARIO_LOGADO ));
 
-    cadastrar = () => {       
-        const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
-        const { tipo, status, valor, mes, ano, descricao } = this.state; 
+    const cadastrar = () => {        
+        const { tipo, status, valor, mes, ano, descricao } = cadastroLancamento; 
         const lancamento = {
             tipo, status, valor, mes, ano, descricao,
             usuario: usuarioLogado.id
         }
 
         try {
-            this.service.validar(lancamento);
+            service.validar(lancamento);
         } catch (erro) {           
             const mensagens = erro.msg;
             mensagens.forEach(msg => mensagemAlerta(msg));
             return false;
         }
 
-        this.service.salvar(lancamento)
+        service.salvar(lancamento)
             .then( response => {
             mensagemSucesso('Lançamento cadastrado com sucesso!');
-            this.setState({tipo: 'RECEITA',
+            setCadastroLancamento({tipo: 'RECEITA',
                            status: 'PENDENTE',
                            valor: 0.00,
                            mes: '',
@@ -59,173 +56,133 @@ class CadastroLancamentos extends React.Component {
         });
     }
 
-    handleChange = (event) => {
-        const value = event.target.value;
-        const name = event.target.name;
-
-        this.setState( currentState => ({ ...currentState, [name]: value}));
+    const handleCadastroLancamentoChange = (event) => {
+        setCadastroLancamento(currentState => ({ ...currentState, [event.target.name]: event.target.value }));
     }
 
-    /* componentDidMount(){
-        const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' );
-        this.service.consultarDescricao(usuarioLogado.id)
-                    .then(response => {                                               
-                        this.setState( currentState => ({ ...currentState, descricoes: response.data }));                        
-                    }).catch(error => {
-                        mensagemErro(error.response.data);
-                    });
-    }
-
-    pesquisarDescricao(event) {        
-        setTimeout(() => {
-            let descricoesFiltradas = [];
-            if (!event.query.trim().length) {
-                descricoesFiltradas = [...this.state.descricoes];
-            }
-            else {
-                descricoesFiltradas = this.state.descricoes.filter( des => {
-                    return des.toLowerCase().startsWith(event.query.toLowerCase());
-                });
-            }
-
-            this.setState( currentState => ({ ...currentState, descricoesFiltradas: descricoesFiltradas }));
-        }, 250);
-    } */
-    
-    render(){        
-
-        const tipos = this.service.obterListaTipos();
-
-        const meses = this.service.obterListaMeses();
-
-        const status = this.service.obterListaStatus();
-
-        return(
-            <div className="container">
-                <Card title="Cadastro Lançamentos">
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="bs-component">
-                                <FormGroup htmlFor="cadastroTipo" label="Tipo: *">                                    
-                                    <SelectButton id="cadastroTipo"
-                                                  value={this.state.tipo} 
-                                                  options={tipos}
-                                                  name="tipo" 
-                                                  onChange={this.handleChange} />
-                                </FormGroup>
-                            </div>
+    return(
+        <div className="container">
+            <Card title="Cadastro Lançamentos">
+                <div className="row">
+                    <div className="col-md-6">
+                        <div className="bs-component">
+                            <FormGroup htmlFor="cadastroTipo" label="Tipo: *">                                    
+                                <SelectButton id="cadastroTipo"
+                                              value={cadastroLancamento.tipo} 
+                                              options={listaTipos}
+                                              name="tipo" 
+                                              onChange={handleCadastroLancamentoChange} />
+                            </FormGroup>
                         </div>
-                        <div className="col-md-6">
-                            <div className="bs-component">
-                                <div className="grid p-fluid">
-                                    <FormGroup htmlFor="cadastroStatus" label="Status: ">                                    
-                                    <SelectButton id="cadastroStatus"
-                                                  value={this.state.status} 
-                                                  options={status}
-                                                  name="status" 
-                                                  onChange={this.handleChange} />
-                                </FormGroup>
-                                </div>
-                            </div>
-                        </div>
-                    </div>              
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="bs-component">
-                                <div className="grid p-fluid">
-                                   <FormGroup htmlFor="cadastroDescricao" label="Descrição: *">
-                                        <InputText id="inputDescricao"
-                                                   value={this.state.descricao}
-                                                   name="descricao"
-                                                   onChange={this.handleChange}                                         
-                                                   placeholder="Digite o Descrição"/>
-                                   </FormGroup>                                                            
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="bs-component">
-                                <div className="grid p-fluid">
-                                    <FormGroup htmlFor="cadastroValor" label="Valor: *">
-                                        <InputNumber id="cadastroValor"
-                                                     inputId="currency-br" 
-                                                     value={this.state.valor}
-                                                     name="valor" 
-                                                     onValueChange={this.handleChange} 
-                                                     mode="currency" 
-                                                     currency="BRL" 
-                                                     locale="pt-BR"
-                                                     placeholder="R$ 0,00" />
-                                    </FormGroup>           
-                                                            
-                                </div>
-                            </div>
-                        </div>
-                    </div>                    
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="bs-component">
-                                <div className="grid p-fluid">
-                                    <FormGroup htmlFor="cadastroMes" label="Mês: *">
-                                        <Dropdown id="cadastroMes"
-                                                  value={this.state.mes} 
-                                                  options={meses}
-                                                  name="mes" 
-                                                  onChange={this.handleChange} 
-                                                  optionLabel="label" 
-                                                  placeholder="Selecione o mês..." />                                                            
-                                    </FormGroup>            
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="bs-component">
-                                <div className="grid p-fluid">
-                                    <FormGroup htmlFor="cadastroAno" label="Ano: *">
-                                        <InputNumber id="cadastroAno"
-                                                     inputId="minmax-buttons" 
-                                                     value={this.state.ano}
-                                                     name="ano" 
-                                                     onValueChange={this.handleChange} 
-                                                     mode="decimal"
-                                                     format={false} 
-                                                     showButtons min={2020} max={2030} />                                                          
-                                    </FormGroup>            
-                                </div>
+                    </div>
+                    <div className="col-md-6">
+                        <div className="bs-component">
+                            <div className="grid p-fluid">
+                                <FormGroup htmlFor="cadastroStatus" label="Status: ">                                    
+                                <SelectButton id="cadastroStatus"
+                                              value={cadastroLancamento.status} 
+                                              options={listaStatus}
+                                              name="status" 
+                                              onChange={handleCadastroLancamentoChange} />
+                            </FormGroup>
                             </div>
                         </div>
                     </div>
-                    <br/>
-                    <div className="row">
-                        <div className="col-md-3">
-                            <div className="bs-component">
-                                <div className="grid p-fluid">
-                                    <Button onClick={this.cadastrar} 
-                                            icon="pi pi-plus" 
-                                            label="Cadastrar" 
-                                            className="p-button-raised p-button-success" />
-                                </div>
+                </div>              
+                <div className="row">
+                    <div className="col-md-6">
+                        <div className="bs-component">
+                            <div className="grid p-fluid">
+                               <FormGroup htmlFor="cadastroDescricao" label="Descrição: *">
+                                    <InputText id="inputDescricao"
+                                               value={cadastroLancamento.descricao}
+                                               name="descricao"
+                                               onChange={handleCadastroLancamentoChange}                                         
+                                               placeholder="Digite o Descrição"/>
+                               </FormGroup>                                                            
                             </div>
                         </div>
-                        <div className="col-md-3">
-                            <div className="bs-component">
-                                <div className="grid p-fluid">
-                                    <Button onClick={() => { window.location.href="/consulta-lancamento"; }} 
-                                            icon="pi pi-search" 
-                                            label="Consultar" 
-                                            className="p-button-raised" />
-                                </div>
+                    </div>
+                    <div className="col-md-6">
+                        <div className="bs-component">
+                            <div className="grid p-fluid">
+                                <FormGroup htmlFor="cadastroValor" label="Valor: *">
+                                    <InputNumber id="cadastroValor"
+                                                 inputId="currency-br" 
+                                                 value={cadastroLancamento.valor}
+                                                 name="valor" 
+                                                 onValueChange={handleCadastroLancamentoChange} 
+                                                 mode="currency" 
+                                                 currency="BRL" 
+                                                 locale="pt-BR"
+                                                 placeholder="R$ 0,00" />
+                                </FormGroup>           
+                                                        
                             </div>
                         </div>
-                    </div>                                        
-                </Card>
-            </div>
-        )
-    }
-
+                    </div>
+                </div>                    
+                <div className="row">
+                    <div className="col-md-6">
+                        <div className="bs-component">
+                            <div className="grid p-fluid">
+                                <FormGroup htmlFor="cadastroMes" label="Mês: *">
+                                    <Dropdown id="cadastroMes"
+                                              value={cadastroLancamento.mes} 
+                                              options={listaMeses}
+                                              name="mes" 
+                                              onChange={handleCadastroLancamentoChange} 
+                                              optionLabel="label" 
+                                              placeholder="Selecione o mês..." />                                                            
+                                </FormGroup>            
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-6">
+                        <div className="bs-component">
+                            <div className="grid p-fluid">
+                                <FormGroup htmlFor="cadastroAno" label="Ano: *">
+                                    <InputNumber id="cadastroAno"
+                                                 inputId="minmax-buttons" 
+                                                 value={cadastroLancamento.ano}
+                                                 name="ano" 
+                                                 onValueChange={handleCadastroLancamentoChange} 
+                                                 mode="decimal"
+                                                 format={false} 
+                                                 showButtons min={2020} max={2030} />                                                          
+                                </FormGroup>            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <div className="row">
+                    <div className="col-md-3">
+                        <div className="bs-component">
+                            <div className="grid p-fluid">
+                                <Button onClick={cadastrar} 
+                                        icon="pi pi-plus" 
+                                        label="Cadastrar" 
+                                        className="p-button-raised p-button-success" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-3">
+                        <div className="bs-component">
+                            <div className="grid p-fluid">
+                                <Button onClick={() => { window.location.href="/consulta-lancamento"; }} 
+                                        icon="pi pi-search" 
+                                        label="Consultar" 
+                                        className="p-button-raised" />
+                            </div>
+                        </div>
+                    </div>
+                </div>                                        
+            </Card>
+        </div>
+    )
 }
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default () => (
-    <CadastroLancamentos history={useNavigate()} />
-);
+function UserService() {
+    return new LancamentoService();
+}
